@@ -1,0 +1,340 @@
+# Configuration
+
+## Credentials
+
+The following properties are required for general project configuration:
+
+- **Project Name**: A name for this project.
+- **Deployment**: Choose if you want to use the configuration tool to configure production or development infrastructure
+- **AWS Region**: The [AWS region](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/#:~:text=AWS%20maintains%20multiple%20geographic%20Regions,Africa%2C%20and%20the%20Middle%20East.) infrastructure that your project should be deployed to.
+
+The stack needs access to AWS creds. If you have the [AWS CLI](https://aws.amazon.com/cli/) installed and have [credentials configured locally](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html), the project will use the default AWS user if no other configuration options are provided. You can check if the default AWS user is configured by running:
+
+```
+aws configure list
+
+```
+
+The AWS CLI uses a standardized location to store AWS credentials and configuration. The project will attempt to read from this configuration if no other configuration was provided.
+
+Please see the AWS documentation to learn more about where these files are stored and how to create them: [AWS CLI / Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+
+Note that both the `credentials` as well as the `config` file are required, and in the `config` file specifically the `region` needs to be specified.
+
+The `default` profile will be used if no profile is specified. If you want to use more than one profile (e.g. for different deployment stages) you can use the AWS configuration file. This file is stored in the repository in the following location:
+
+```
+config/infra/aws/config.json
+
+```
+
+You can define a number of different users as follows:
+
+```
+{
+  "users": [
+    {
+      "name": "dev",
+      "type": "profile",
+      "config": {
+        "profile": "default",
+        "awsDefaultRegion": "us-west-2"
+      }
+    },
+    {
+      "name": "prod",
+      "type": "profile",
+      "config": {
+        "profile": "prod",
+        "awsDefaultRegion": "us-west-2"
+      }
+    }
+  ]
+}
+
+```
+
+Note that overriding the path of the default AWS configuration and credentials files is also supported:
+
+```
+{
+  "users": [
+    {
+      "name": "prod",
+      "type": "profile",
+      "config": {
+        "profile": "prod",
+        "awsDefaultRegion": "us-west-2",
+        "awsConfigFileName": "/path/to/config/file",
+        "awsCredentialsFileName": "/path/to/credentials/file"
+      }
+    }
+  ]
+}
+
+```
+
+There are a number of issues when trying to work with multiple profiles and SSO credentials however given we are working in a single env, they are non-issues at the moment.
+
+An excellent way to deal with situations where we do not want to provide the user credentials directly is to use [process credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sourcing-external.html).
+
+You can define process credentials in the `config/infra/aws/config.json` file.
+
+```
+"users": [
+    {
+      "name": "dev-user",
+      "type": "profile",
+      "config": {
+        "profile": "with-process",
+        "awsDefaultRegion": "us-west-2",
+        "credentialsSource": "process"
+      }
+    }
+  ]
+
+```
+
+This will require a `~/.aws/config` file as follows:
+
+```
+[with-process]
+credential_process=[your command]
+
+```
+
+Useful commands to use in the `credential_process` field are: [aws-sso-creds-helper](https://github.com/ryansonshine/aws-sso-creds-helper), [aws-sso-util](https://github.com/benkehoe/aws-sso-util#adding-aws-sso-support-to-aws-sdks), [aws-vault](https://github.com/99designs/aws-vault/blob/0615e7c8cddc5d5046e29b87acfc0fe73c1aa998/USAGE.md#using-credential_process) and [aws2-wrap](https://github.com/linaro-its/aws2-wrap#use-the-credentials-via-awsconfig).
+
+Note that it is also possible to place the credentials file in a different location.
+
+```
+{
+  "users": [
+    {
+      "name": "prod",
+      "type": "profile",
+      "config": {
+        "profile": "prod",
+        "awsDefaultRegion": "us-west-2",
+        "awsConfigFileName": "/path/to/config/file",
+        "credentialsSource": "process"
+      }
+    }
+  ]
+}
+
+```
+
+AWS credentials they can be configured directly in the main configuration file. If you can, use the user credentials or environment variables.
+
+This file can be found under the following paths:
+
+```
+config/infra/aws/config.json
+
+```
+
+The configuration file can have contents as follows:
+
+```
+{
+  "users": [
+    {
+      "name": "dev-user",
+      "type": "apiKey",
+      "config": {
+        "awsAccessKeyId": "[Your Access Key ID]",
+        "awsSecretAccessKey": "[Your Secret Access Key]",
+        "awsDefaultRegion": "[Region for user]"
+      }
+    },
+    {
+      "name": "prod-user",
+      "type": "apiKey",
+      "config": {
+        "awsAccessKeyId": "[Your Access Key ID]",
+        "awsSecretAccessKey": "[Your Secret Access Key]",
+        "awsDefaultRegion": "[Region for user]"
+      }
+    }
+  ]
+}
+
+```
+
+Make sure that the `"name"` property matches the `"awsUser"` of module deployments for which the user should be used. There is no limit to how many users you can define.
+
+Note that this file should _not_ checked into source control if AWS credentials are provided.
+
+If you want to supply AWS user credentials in a CI/CD system, these can be supplied using environment variables and for local development you can use the files provided by the AWS CLI (see above).
+
+AWS _Access Key ID_ and _Secret Access Key_ can be read from environment variables. The easiest way is to set the following environment variables:
+
+```
+AWS_USER_NAME: [Your user name]
+AWS_ACCESS_KEY_ID: [Your access key id]
+AWS_SECRET_ACCESS_KEY: [Your secret access key]
+AWS_DEFAULT_REGION: [User region]
+
+```
+
+The `AWS_USER_NAME` variable is optional but can be useful for explicitly referencing the correct user in deployments. The above setup is particularly useful for CI/CD environments. For instance, when using [GitHub Actions](https://github.com/actions), environment variables could be configured as follows:
+
+```
+- name: Deploy UI
+  run: |
+    yarn workspace my-ui deploy dev
+  env:
+    AWS_USER_NAME: dev-user
+    AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+    AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+    AWS_DEFAULT_REGION: us-west-2
+
+```
+
+The values of the environment variables are defined in [GitHub Secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets).
+
+## DNS Config
+
+To deploy a site or an api to a domain you can get DNS configuration required but you need to specify the [Route 53 hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/AboutHZWorkingWith.html) that the DNS entries should be added to. You can either use an already existing hosted zone or create a new one.
+
+Note that you can specify the domain name of the hosted zone directly, or one of its subdomains. If your hosted zone domain is `glyphx.co` you can configure the website to be deployed to `glyphx.co` or `website.glyphx.co`.
+
+You can use the same hosted zone for multiple modules. Just make sure to use subdomains to avoid conflicts between packages.
+
+## Terraform
+
+All modules contain Terraform Infrastructure as Code definitions. This amounts to easy tooling to stand up this infrastructure. Terraform will use the _AWS credentials_ configured as per the instructions above.
+
+All state will be stored in [Terraform S3 remote state using DynamoDB locking](https://www.terraform.io/docs/language/settings/backends/s3.html). A bucket for storing the state in the same AWS account that the infrastructure is deployed to will automatically be created (thus being able to use the same AWS credentials).
+
+During standing up the infrastructure for the first package of a project, the`config/infra/aws/terraform.json` file is created that contains the S3 bucket and DynamoDB table for all packages deployed to a respective AWS account. Below an example `terraform.json` file.
+
+```
+{
+  "remoteState": [
+    {
+      "user": "dev",
+      "terraformStateBucket": "tfstate-67a73e60720c25855a39baeb1218b55229578671",
+      "terraformStateDynamoDBTable": "tfstate-a82076777995c7254fbcae1f9e8013fee75833f2-lock"
+    },
+    {
+      "user": "prod",
+      "terraformStateBucket": "tfstate-0cb1a35a83c9c952321ee4addbe76d096b031d47",
+      "terraformStateDynamoDBTable": "tfstate-0cb1a35a83c9c957772ee4addbe76d096b031d47-lock"
+    }
+  ]
+}
+
+```
+
+```
+{
+  "remoteState": [
+    {
+      "user": "dev",
+      "terraformStateBucket": "tfstate-67a73e60720c25855a39baeb1218b55229578671",
+      "terraformStateDynamoDBTable": "tfstate-a82076777995c7254fbcae1f9e8013fee75833f2-lock"
+    },
+    {
+      "user": "prod",
+      "terraformStateBucket": "tfstate-0cb1a35a83c9c952321ee4addbe76d096b031d47",
+      "terraformStateDynamoDBTable": "tfstate-0cb1a35a83c9c957772ee4addbe76d096b031d47-lock"
+    }
+  ]
+}
+
+```
+
+```
+{
+  "remoteState": [
+    {
+      "user": "dev",
+      "terraformStateBucket": "tfstate-67a73e60720c25855a39baeb1218b55229578671",
+      "terraformStateDynamoDBTable": "tfstate-a82076777995c7254fbcae1f9e8013fee75833f2-lock"
+    },
+    {
+      "user": "prod",
+      "terraformStateBucket": "tfstate-0cb1a35a83c9c952321ee4addbe76d096b031d47",
+      "terraformStateDynamoDBTable": "tfstate-0cb1a35a83c9c957772ee4addbe76d096b031d47-lock"
+    }
+  ]
+}
+
+```
+
+To prevent auto-generation of the bucket and table names, provide a `terraform.json` file before standing up the infrastructure for your first package. The project will create a bucket and table using the names you specify then. Also, if you have special requirements for your bucket and table, you can create these before standing up the infrastructure. You only need to ensure that the bucket and table fulfill the requirements of Terraform for storing its remote state.
+
+All packages included in a project will use the same bucket and DynamoDB table. The name of the state file will be defined in the `stack.json` file within each package.
+
+```
+{
+  "$schema": "./schemas/package.schema.json",
+  "name": "mypackage",
+  "deployments": [
+    {
+      "name": "dev",
+      "tfStateKey": "mypackage-dev-f53056a8788c8eb7a1ac.tfstate"
+    }
+  ]
+}
+
+```
+
+If the `tfStateKey` property is defined before running `yarn infra init [deployment]`, the name specified will be used as key for the state in bucket and DynamoDB table. If the `tfStateKey` property is not defined, a name will be generated and `goldstack.json` updated.
+
+Ensure that after standing up infrastructure for the first time to commit and push changes to your project, since `goldstack.json` and `config/infra/aws/terraform.json` config will be updated. This is only required for initializing the infrastructure for each package and target AWS account (and if you do not provide the names for bucket, table and state files manually). For subsequent updates to the infrastructure it is not necessary to update the source files.
+
+Terraform frequently releases new versions of their tooling - this must be watched.
+
+You can define the version of Terraform that is to be used for executing infrastructure commands in two ways:
+
+1. Centrally for a package using a file `infra/tfConfig.json` such as the following:
+
+```
+{
+  "tfVersion": "1.1"
+}
+
+```
+
+1. If a project has multiple different deployments that require different Terraform versions, or for first upgrading Terraform for test environments, it is also possible to specify the Terraform version per deployment. For this, add the `"tfVersion"` property to a `"configuration"` for a deployment in `stack.json`, for instance:
+
+```
+{
+  "$schema": "./schemas/package.schema.json",
+  "name": "lambda-api-template",
+  "template": "lambda-api",
+  "templateVersion": "0.1.0",
+  "configuration": {},
+  "deployments": [
+    {
+      "name": "prod",
+      "awsRegion": "us-west-2",
+      "awsUser": "local-dev",
+      "configuration": {
+        "tfVersion": "1.1"
+      }
+    }
+  ]
+}
+
+```
+
+Changing the Terraform version will result in using the specified version of the Docker image `hashicorp/terraform:[version]`. Please avoid specifying minor versions: use `0.12` not `0.12.1`.
+
+Note that Terraform often provides upgrade scripts for Terraform. These can either be applied by installing the matching Terraform version locally or using the following command:
+
+```
+yarn infra upgrade [deployment] [targetVersion]
+
+```
+
+Note that this command is only supported for a limited number of versions. Also versions need to be upgraded one jump at a time, e.g. going from `0.12` to `0.13` is supported but not going from `0.12` to `0.14` or higher versions. For a reference of available versions, see [Terraform Versions](https://releases.hashicorp.com/terraform/).
+
+It is recommend to run `yarn infra init [deployment]`, `yarn infra up [deployment]` and `yarn deploy [deployment]` after every `upgrade` command.
+
+Note that you may have to upgrade various versions in `infra/aws/terraform/providers.tf` as well as making various other changes upgrading Terraform may involve, also see [Terraform Upgrade Guides](https://www.terraform.io/language/upgrade-guides).
+
+[AWS Configuration](https://docs.goldstack.party/docs/goldstack/configuration#aws-configuration)[Hosted Zone Configuration](https://docs.goldstack.party/docs/goldstack/configuration#hosted-zone-configuration)[Terraform](https://docs.goldstack.party/docs/goldstack/configuration#terraform)

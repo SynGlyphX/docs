@@ -1,7 +1,6 @@
 {
   "index": "Introduction",
-  "get-started": "Get Started",
-  "features": "Features",
-  "themes": "Themes",
-  "advanced": "Advanced"
+  "developer-guides": "Developer Guides",
+  "user-guides": "User Guides",
+  "resources": "Resources"
 }

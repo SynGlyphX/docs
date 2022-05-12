@@ -1,11 +1,9 @@
-import Bleed from 'nextra-theme-docs/bleed'
+# Welcome to Glyphx documentation
 
-# Nextra
+Here you will find everything you need to know about developing and using Glyphx. Whether you are a consultant working on onboarding lcients or a developer looking to make your first contribution, this is the central source of truth for up to date documentation and resources.
 
-**Nextra** is a [Next.js](https://nextjs.org) based static site generator.
+## Intro
 
-It supports Markdown and React components ([MDX](/features/mdx)), automatically generated [sidebar and anchor links](/get-started#sidebar-and-anchor-links), file-system based routing, built-in syntax highlighting, image optimization, custom layouts, i18n, and all the features you love about Next.js.
+Rather than providing a library of projects (and associated repos), the project is architected as a *library of modules* that can be used to compose new projects. This ensures each new frontends or backends can be quickly spun up and reasoned about in the same way across initiatives for a small team of engineers.
 
-Here's what you will get in 1 minute:
-
-<Bleed>![Nextra Example](../public/demo.png)</Bleed>
+All modules are configured to be easily used alongside each other. For instance, you can link the Lambda Express module to the Next JS application and the S3 module with the Express application. All modules are deployed into a project configured using Yarn workspaces.

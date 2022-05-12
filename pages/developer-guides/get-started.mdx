@@ -1,0 +1,49 @@
+# Get Started
+A few dependencies need to be available in your development system. Please verify they are present or install them.
+
+- Node v12+
+- Yarn v1.22.5+
+- Docker v19+
+
+Open a terminal and run the following commands:
+
+```bash
+node -v
+yarn -v
+docker --version
+```
+
+This should produce the following output:
+
+```bash
+v14.17.6
+1.22.17
+Docker version 20.10.11, build dea9396
+```
+
+If you need to install or update any of the dependencies, please see the following guides:
+
+Run `yarn` in your project directory to install and download all dependencies.
+
+The installation process should take around 3-10 minutes depending on your setup.
+
+You can confirm everything was installed correctly by running `yarn -v`. This should show a yarn version of `3.0.0+`.
+
+Make sure that the project compiles correctly by running `yarn build` your project directory:
+
+Note that this command also ensures that all TypeScript project references are configured correctly.
+
+Click on “Install” all recommended extensions
+
+Locate a `.ts` or `.tsx` file in the workspace and open it. When asked whether to use the workspace TypeScript version, click _Allow_.
+
+Useful Commands
+
+- `yarn build`: Will build all modules in the project.
+- `yarn compile`: Will compile all TypeScript code.
+- `yarn fix-project-references`: Will ensure all [TypeScript project references](https://www.typescriptlang.org/docs/handbook/project-references.html) between the packages in the project are correct. Always run this after adding a new package or changing the dependencies between packages in the project.
+- `yarn test-watch`: Will run tests when modules have changed.
+- `yarn format-check` and `yarn format`: Will check or fix source code formatting using Prettier
+- `yarn lint` and `yarn lint-fix`: Will check or auto-fix linting issues using ESLint.
+
+Note that you can run all of these commands in the context of individual modules as well. If you only modify code within one module, this is sufficient. However, if you develop multiple modules at the same time, it is important to run these commands at the project root.

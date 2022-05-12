@@ -1,7 +1,7 @@
 export default {
-  github: 'https://github.com/shuding/nextra',
-  docsRepositoryBase: 'https://github.com/shuding/nextra/blob/master',
-  titleSuffix: ' – Nextra',
+  github: 'https://github.com/SynGlyphX/docs.git',
+  docsRepositoryBase: 'https://github.com/SynGlyphX/docs/blob/master',
+  titleSuffix: 'The Data Studio Company',
   logo: (
     <>
       <span className="mr-2 font-extrabold hidden md:inline">Glyphx</span>
@@ -16,15 +16,15 @@ export default {
       <meta name="theme-color" content="#ffffff" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta httpEquiv="Content-Language" content="en" />
-      <meta name="description" content="Nextra: the Next.js site builder" />
-      <meta name="og:description" content="Nextra: the Next.js site builder" />
+      <meta name="description" content="Glyphx: The Data Studio Company" />
+      <meta name="og:description" content="Glyphx: The Data Studio Company" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:image" content="https://nextra.vercel.app/og.png" />
       <meta name="twitter:site:domain" content="nextra.vercel.app" />
       <meta name="twitter:url" content="https://nextra.vercel.app" />
-      <meta name="og:title" content="Nextra: Next.js static site generator" />
+      <meta name="og:title" content="Glyphx: The Data Studio Company" />
       <meta name="og:image" content="https://nextra.vercel.app/og.png" />
-      <meta name="apple-mobile-web-app-title" content="Nextra" />
+      <meta name="apple-mobile-web-app-title" content="Glyphx Docs" />
       <link
         rel="apple-touch-icon"
         sizes="180x180"
@@ -54,6 +54,7 @@ export default {
         sizes="16x16"
         href="/favicon-16x16.png"
       />
+      <title>Glyphx - The Data Studio Company</title>
       <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
     </>
   ),
@@ -62,6 +63,6 @@ export default {
   nextLinks: true,
   footer: true,
   footerEditLink: 'Edit this page on GitHub',
-  footerText: <>MIT {new Date().getFullYear()} © Nextra.</>,
-  unstable_faviconGlyph: '👋',
+  footerText: <>{new Date().getFullYear()} © Glyphx.</>,
+  unstable_faviconGlyph: '',
 }
