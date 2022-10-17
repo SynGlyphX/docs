@@ -1,6 +1,7 @@
 {
   "index": "Introduction",
-  "developer-guides": "Developer Guides",
-  "user-guides": "User Guides",
-  "resources": "Resources"
+  "architecture": "Architecture",
+  "qt-api": "Qt Interface",
+  "user-guides": "User Guides (TBD)",
+  "v2": "Future State"
 }

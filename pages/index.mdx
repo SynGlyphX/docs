@@ -1,9 +1,44 @@
 # Welcome to Glyphx documentation
 
-Here you will find everything you need to know about developing and using Glyphx. Whether you are a consultant working on onboarding lcients or a developer looking to make your first contribution, this is the central source of truth for up to date documentation and resources.
+Here you will find everything you need to know about developing and using Glyphx. Whether you are a consultant working on onboarding clients or a developer looking to make your first contribution, this is the central source of truth for up to date documentation and resources.
 
-## Intro
+## Stack Overview
 
-Rather than providing a library of projects (and associated repos), the project is architected as a *library of modules* that can be used to compose new projects. This ensures each new frontends or backends can be quickly spun up and reasoned about in the same way across initiatives for a small team of engineers.
+- React v.18.0.2 (Frontend)
+- TailwindCSS v3.0.15 w/ autoprefixer (Styling)
+- Next.js v12.2.5 (Framework)
+- Recoil v0.7.5 (State Management)
+- Cypress (Testing)
+- AWS Amplify (Graphql backend)
+- qtwebchannel v5.9.0 (Qt Message Bus / Interface)
 
-All modules are configured to be easily used alongside each other. For instance, you can link the Lambda Express module to the Next JS application and the S3 module with the Express application. All modules are deployed into a project configured using Yarn workspaces.
+## Key libraries
+
+- React DnD (low-level drag and drop)
+- date-fns (stripped down date handling)
+- fuse.js (fuzzy search)
+
+## Recoil State Management
+
+Recoil was developed for the needs of the facebook team working on an application which had a number of similar requirements to Glyphx.
+
+- Lots on interactivity
+- State persistance via shareable links
+- Lots of settings affecting many queries that are combined on the client
+- Lots of functionality that will reuire external plugins and APIs
+
+Hits limitations of existing state mgmt libraries rather quickly and hinders velocity
+
+### Key benefits
+
+#### Flexible shared state
+
+    - Have different components in sync at disparate parts of the react tree
+
+#### Derived state & queries
+
+    - Allows you to change state logic quickly with minimal bugs (b/c modelled as pure functions)
+
+#### App-wise state observation
+
+    - Opens the door to time-travel debugging, state persistence, undo support, logging which are difficult to achieve otherwise
